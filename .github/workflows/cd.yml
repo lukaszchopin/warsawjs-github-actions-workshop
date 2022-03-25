@@ -1,0 +1,48 @@
+name: Deploy
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      # TODO(lukaszchopin): add a build step here
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'yarn'
+
+      - name: Cache node modules and artifacts
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            /home/runner/.cache/Cypress
+            **/node_modules
+          key: yarn-cache-${{ hashFiles('**/yarn.lock')}}
+
+      - name: Install deps
+        if: steps.yarn-cache.outputs.cache-hit != true
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "warsaw-js-github-actions"
+          entrypoint: "https://deno.land/std/http/file_server.ts"
+ # TODO(lukaszchopin): update
+          root: "dist/apps/unicorn-hunt" # TODO(lukaszchopin): update

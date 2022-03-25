@@ -1,5 +1,4 @@
 name: CI
-# comment
 on:
   pull_request:
     branches:

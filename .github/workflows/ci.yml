@@ -21,7 +21,16 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
+      - name: Cache node modules and artifacts
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+          key: yarn-cache-${{ hashFiles('**/yarn.lock')}}
+
       - name: Install deps
+        if: steps.yarn-cache.outputs.cache-hit != true
         run: yarn install
 
   test:
@@ -40,9 +49,17 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
-      - name: Install deps
-        run: yarn install
+      - name: Cache node modules and artifacts
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+          key: yarn-cache-${{ hashFiles('**/yarn.lock')}}
 
+      - name: Install deps
+        if: steps.yarn-cache.outputs.cache-hit != true
+        run: yarn install
       - name: Run tests
         run: yarn test:ci
 
@@ -62,7 +79,16 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
+      - name: Cache node modules and artifacts
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+          key: yarn-cache-${{ hashFiles('**/yarn.lock')}}
+
       - name: Install deps
+        if: steps.yarn-cache.outputs.cache-hit != true
         run: yarn install
 
       - name: Run lint
@@ -85,7 +111,16 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
+      - name: Cache node modules and artifacts
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+          key: yarn-cache-${{ hashFiles('**/yarn.lock')}}
+
       - name: Install deps
+        if: steps.yarn-cache.outputs.cache-hit != true
         run: yarn install
 
       - name: Run tests e2e
